@@ -30,8 +30,6 @@ html, body {
   --text-size: 35px;
 }
 
-/* NEW FONT */
-
 @font-face {
   font-family: "UniSans";
   src: url("images/Uni%20Sans%20Heavy%20Italic.otf") format("opentype");
@@ -39,8 +37,6 @@ html, body {
   font-style: italic;
   font-display: swap;
 }
-
-/* MAIN CONTAINER */
 
 #wrap {
   position: fixed;
@@ -60,8 +56,6 @@ html, body {
   transform-origin: bottom center;
 }
 
-/* SVG */
-
 svg {
   position: absolute;
   inset: 0;
@@ -69,8 +63,6 @@ svg {
   height: 100%;
   overflow: visible;
 }
-
-/* MAIN OVAL */
 
 #oval {
   fill: url(#panelGradient);
@@ -85,8 +77,6 @@ svg {
     drop-shadow(0 0 5px rgba(200,170,110,0.18));
 }
 
-/* INNER HIGHLIGHT */
-
 #oval-highlight {
   fill: none;
   stroke: rgba(255,238,205,0.22);
@@ -94,8 +84,6 @@ svg {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
 }
-
-/* GOLDEN DOT */
 
 #dot {
   fill: var(--gold);
@@ -106,8 +94,6 @@ svg {
     drop-shadow(0 0 9px rgba(200,170,110,0.25));
 }
 
-/* MESSAGE */
-
 #message {
   position: absolute;
   top: 50%;
@@ -116,13 +102,11 @@ svg {
 
   font-family: "UniSans", Arial, sans-serif;
   font-size: var(--text-size);
-
   font-weight: 900;
   font-style: italic;
 
   letter-spacing: 2px;
   white-space: nowrap;
-
   color: var(--ivory);
 
   text-shadow:
@@ -132,8 +116,6 @@ svg {
   clip-path: inset(0 100% 0 0);
 }
 
-/* VISIBILITY */
-
 #wrap.visible {
   opacity: 1;
 }
@@ -141,7 +123,6 @@ svg {
 /* LUXURY PULSE */
 
 @keyframes goldenPulse {
-
   0%, 100% {
     filter:
       drop-shadow(0 0 3px rgba(200,170,110,0.15))
@@ -239,14 +220,18 @@ svg {
 
 <script>
 
-/* ANIMATION SETTINGS */
+/* ==================================
+   PRODUCTION TIMINGS
+================================== */
 
-const HIDDEN_TIME = 10000;
-const ANIMATION_TIME = 10000;
-const HOLD_TIME = 30000;
-const FADE_TIME = 5000;
+const HIDDEN_TIME = 180000;     // 3 minutes
+const ANIMATION_TIME = 10000;   // 10 seconds
+const HOLD_TIME = 30000;        // 30 seconds
+const FADE_TIME = 5000;         // 5 seconds
 
-/* ELEMENTS */
+/* ==================================
+   ELEMENTS
+================================== */
 
 const wrap = document.getElementById("wrap");
 const oval = document.getElementById("oval");
@@ -296,7 +281,7 @@ function resetAnimation() {
   wrap.classList.remove("visible");
 }
 
-/* DOT ANIMATION */
+/* GOLDEN DOT ANIMATION */
 
 function animate() {
 
@@ -317,12 +302,14 @@ function animate() {
 
       const eased = 1 - Math.pow(1 - progress, 2);
 
+      // Draw oval
       oval.style.strokeDashoffset =
         pathLength * (1 - eased);
 
       highlight.style.strokeDashoffset =
         pathLength * (1 - eased);
 
+      // Move golden dot
       const point = oval.getPointAtLength(
         pathLength * eased
       );
@@ -330,6 +317,7 @@ function animate() {
       dot.setAttribute("cx", point.x);
       dot.setAttribute("cy", point.y);
 
+      // Reveal text
       message.style.clipPath =
         `inset(0 ${(1 - eased) * 100}% 0 0)`;
 
@@ -349,40 +337,50 @@ function animate() {
   });
 }
 
-/* MAIN CYCLE */
+/* MAIN REPEATING CYCLE */
 
 const sleep = ms =>
   new Promise(resolve => setTimeout(resolve, ms));
 
 async function runCycle() {
 
+  // Wait for font loading
   if (document.fonts && document.fonts.ready) {
     await document.fonts.ready;
   }
 
   while (true) {
 
+    // Reset overlay
     resetAnimation();
 
+    // Invisible for 3 minutes
     await sleep(HIDDEN_TIME);
 
+    // Show overlay
     wrap.classList.add("visible");
 
+    // Animate for 10 seconds
     await animate();
 
+    // Pulse for 30 seconds
     wrap.classList.add("pulsing");
 
     await sleep(HOLD_TIME);
 
+    // Stop pulsing
     wrap.classList.remove("pulsing");
 
+    // Fade away over 5 seconds
     wrap.classList.add("fade");
 
     await sleep(FADE_TIME);
 
+    // Completely hide
     wrap.classList.remove("visible");
     wrap.classList.remove("fade");
 
+    // Loop repeats automatically
   }
 }
 
