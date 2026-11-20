@@ -1,0 +1,396 @@
+
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+}
+
+:root {
+  --bottom: 220px;
+  --design-w: 900px;
+  --design-h: 150px;
+
+  --gold: #C8AA6E;
+  --gold-light: #E8D5A9;
+  --ivory: #F2E9D8;
+
+  --text-size: 35px;
+}
+
+/* NEW FONT */
+
+@font-face {
+  font-family: "UniSans";
+  src: url("images/Uni%20Sans%20Heavy%20Italic.otf") format("opentype");
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* MAIN CONTAINER */
+
+#wrap {
+  position: fixed;
+  bottom: var(--bottom);
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+}
+
+#design {
+  position: relative;
+  width: var(--design-w);
+  height: var(--design-h);
+  transform-origin: bottom center;
+}
+
+/* SVG */
+
+svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* MAIN OVAL */
+
+#oval {
+  fill: url(#panelGradient);
+  stroke: var(--gold);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+
+  filter:
+    drop-shadow(0 2px 5px rgba(0,0,0,0.35))
+    drop-shadow(0 0 5px rgba(200,170,110,0.18));
+}
+
+/* INNER HIGHLIGHT */
+
+#oval-highlight {
+  fill: none;
+  stroke: rgba(255,238,205,0.22);
+  stroke-width: 0.8;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+/* GOLDEN DOT */
+
+#dot {
+  fill: var(--gold);
+  opacity: 0;
+
+  filter:
+    drop-shadow(0 0 4px rgba(200,170,110,0.5))
+    drop-shadow(0 0 9px rgba(200,170,110,0.25));
+}
+
+/* MESSAGE */
+
+#message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  font-family: "UniSans", Arial, sans-serif;
+  font-size: var(--text-size);
+
+  font-weight: 900;
+  font-style: italic;
+
+  letter-spacing: 2px;
+  white-space: nowrap;
+
+  color: var(--ivory);
+
+  text-shadow:
+    0 1px 2px rgba(0,0,0,0.8),
+    0 0 8px rgba(200,170,110,0.15);
+
+  clip-path: inset(0 100% 0 0);
+}
+
+/* VISIBILITY */
+
+#wrap.visible {
+  opacity: 1;
+}
+
+/* LUXURY PULSE */
+
+@keyframes goldenPulse {
+
+  0%, 100% {
+    filter:
+      drop-shadow(0 0 3px rgba(200,170,110,0.15))
+      drop-shadow(0 2px 5px rgba(0,0,0,0.3));
+    opacity: 1;
+  }
+
+  50% {
+    filter:
+      drop-shadow(0 0 9px rgba(200,170,110,0.4))
+      drop-shadow(0 0 17px rgba(200,170,110,0.15))
+      drop-shadow(0 2px 5px rgba(0,0,0,0.3));
+    opacity: 0.94;
+  }
+}
+
+#wrap.pulsing #oval {
+  animation: goldenPulse 2.5s ease-in-out infinite;
+}
+
+#wrap.pulsing #oval-highlight {
+  animation: goldenPulse 2.5s ease-in-out infinite;
+}
+
+#wrap.pulsing #message {
+  animation: goldenPulse 2.5s ease-in-out infinite;
+}
+
+/* FADE OUT */
+
+#wrap.fade {
+  opacity: 0;
+  transition: opacity 5s linear;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="wrap">
+  <div id="design">
+
+    <svg viewBox="0 0 900 150">
+
+      <defs>
+        <linearGradient
+          id="panelGradient"
+          x1="0"
+          y1="0"
+          x2="0"
+          y2="1"
+        >
+          <stop offset="0%" stop-color="#21151A" stop-opacity="0.94"/>
+          <stop offset="50%" stop-color="#120C10" stop-opacity="0.96"/>
+          <stop offset="100%" stop-color="#24151B" stop-opacity="0.94"/>
+        </linearGradient>
+      </defs>
+
+      <path
+        id="oval"
+        d="M 75,75
+           C 75,15 250,15 450,15
+           C 650,15 825,15 825,75
+           C 825,135 650,135 450,135
+           C 250,135 75,135 75,75
+           Z"
+      />
+
+      <path
+        id="oval-highlight"
+        d="M 75,75
+           C 75,15 250,15 450,15
+           C 650,15 825,15 825,75
+           C 825,135 650,135 450,135
+           C 250,135 75,135 75,75
+           Z"
+      />
+
+      <circle
+        id="dot"
+        cx="75"
+        cy="75"
+        r="6.5"
+      />
+
+    </svg>
+
+    <div id="message">
+      ПОСЛЕДВАЙ И ПУСНИ ЧЛЕНЧЕТО
+    </div>
+
+  </div>
+</div>
+
+<script>
+
+/* ANIMATION SETTINGS */
+
+const HIDDEN_TIME = 10000;
+const ANIMATION_TIME = 10000;
+const HOLD_TIME = 30000;
+const FADE_TIME = 5000;
+
+/* ELEMENTS */
+
+const wrap = document.getElementById("wrap");
+const oval = document.getElementById("oval");
+const highlight = document.getElementById("oval-highlight");
+const dot = document.getElementById("dot");
+const message = document.getElementById("message");
+const design = document.getElementById("design");
+
+let pathLength = 0;
+
+/* RESPONSIVE SCALING */
+
+function resizeOverlay() {
+  const scale = Math.min(
+    1,
+    window.innerWidth / 1000
+  );
+
+  design.style.transform = `scale(${scale})`;
+}
+
+window.addEventListener("resize", resizeOverlay);
+resizeOverlay();
+
+/* RESET */
+
+function resetAnimation() {
+
+  pathLength = oval.getTotalLength();
+
+  oval.style.animation = "none";
+  highlight.style.animation = "none";
+  message.style.animation = "none";
+
+  oval.style.strokeDasharray = pathLength;
+  oval.style.strokeDashoffset = pathLength;
+
+  highlight.style.strokeDasharray = pathLength;
+  highlight.style.strokeDashoffset = pathLength;
+
+  dot.style.opacity = "0";
+
+  message.style.clipPath = "inset(0 100% 0 0)";
+
+  wrap.classList.remove("pulsing");
+  wrap.classList.remove("fade");
+  wrap.classList.remove("visible");
+}
+
+/* DOT ANIMATION */
+
+function animate() {
+
+  return new Promise(resolve => {
+
+    const start = performance.now();
+
+    dot.style.opacity = "0.7";
+
+    function frame(now) {
+
+      const elapsed = now - start;
+
+      const progress = Math.min(
+        elapsed / ANIMATION_TIME,
+        1
+      );
+
+      const eased = 1 - Math.pow(1 - progress, 2);
+
+      oval.style.strokeDashoffset =
+        pathLength * (1 - eased);
+
+      highlight.style.strokeDashoffset =
+        pathLength * (1 - eased);
+
+      const point = oval.getPointAtLength(
+        pathLength * eased
+      );
+
+      dot.setAttribute("cx", point.x);
+      dot.setAttribute("cy", point.y);
+
+      message.style.clipPath =
+        `inset(0 ${(1 - eased) * 100}% 0 0)`;
+
+      if (progress < 1) {
+
+        requestAnimationFrame(frame);
+
+      } else {
+
+        dot.style.opacity = "0";
+        resolve();
+
+      }
+    }
+
+    requestAnimationFrame(frame);
+  });
+}
+
+/* MAIN CYCLE */
+
+const sleep = ms =>
+  new Promise(resolve => setTimeout(resolve, ms));
+
+async function runCycle() {
+
+  if (document.fonts && document.fonts.ready) {
+    await document.fonts.ready;
+  }
+
+  while (true) {
+
+    resetAnimation();
+
+    await sleep(HIDDEN_TIME);
+
+    wrap.classList.add("visible");
+
+    await animate();
+
+    wrap.classList.add("pulsing");
+
+    await sleep(HOLD_TIME);
+
+    wrap.classList.remove("pulsing");
+
+    wrap.classList.add("fade");
+
+    await sleep(FADE_TIME);
+
+    wrap.classList.remove("visible");
+    wrap.classList.remove("fade");
+
+  }
+}
+
+/* START */
+
+runCycle();
+
+</script>
+
+</body>
+</html>
